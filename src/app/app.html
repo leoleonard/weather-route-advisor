@@ -1,0 +1,80 @@
+<div [class.dark-theme]="isDarkTheme()">
+  @if (!weatherService.isConfigured()) {
+    <div class="api-key-banner">
+      <mat-icon>key</mat-icon>
+      <span>OpenWeatherMap API key not configured. Edit <code>src/environments/environment.ts</code> — see README.</span>
+      <button mat-icon-button (click)="weatherService.isConfigured.set(true)" aria-label="Dismiss">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+  @if (weatherService.apiError()) {
+    <div class="api-key-banner api-error-banner">
+      <mat-icon>cloud_off</mat-icon>
+      <span>{{ weatherService.apiError() }}</span>
+      <button mat-icon-button (click)="weatherService.apiErrorCode.set(null)" aria-label="Dismiss">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+
+  <mat-toolbar color="primary" class="app-toolbar">
+    <span class="app-title">Weather Route Advisor</span>
+    <span class="spacer"></span>
+
+    <!-- Weather Widget -->
+    <div class="weather-widget">
+      @if (currentTemp() !== null) {
+        <span class="widget-temp">{{ currentTemp() }}°C</span>
+        <span class="widget-rain">{{ weatherService.currentRainProbability() }}% rain</span>
+        <span class="widget-wind" [title]="'Wind: ' + currentWindSpeed() + ' km/h'">
+          <mat-icon class="wind-icon" [style.transform]="'rotate(' + currentWindDeg() + 'deg)'">arrow_upward</mat-icon>
+          {{ currentWindSpeed() }} km/h {{ currentWindDeg() | windDirection }}
+        </span>
+      } @else {
+        <span class="widget-placeholder">Weather loading...</span>
+      }
+    </div>
+
+    <button mat-icon-button (click)="toggleTheme()" [attr.aria-label]="isDarkTheme() ? 'Switch to light theme' : 'Switch to dark theme'">
+      <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="side" opened position="end" class="sidebar">
+      <mat-tab-group>
+        <mat-tab label="Weather">
+          <app-weather-panel></app-weather-panel>
+        </mat-tab>
+        <mat-tab label="Tracks">
+          <app-track-list
+            (tracksChanged)="onTracksChanged($event)"
+            (visibilityChanged)="onVisibilityChanged($event)"
+          ></app-track-list>
+        </mat-tab>
+        <mat-tab label="Routes">
+          <app-recommendation
+            [tracks]="tracks()"
+            (recommendationsChanged)="onRecommendationsChanged($event)"
+          ></app-recommendation>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      @defer (on viewport) {
+        <app-map
+          [tracks]="tracks()"
+          [visibleTrackIds]="visibleTrackIds()"
+          [recommendations]="recommendations()"
+          [windDeg]="currentWindDeg()"
+        ></app-map>
+      } @placeholder {
+        <div class="map-placeholder">
+          <div class="map-skeleton-full"></div>
+        </div>
+      }
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

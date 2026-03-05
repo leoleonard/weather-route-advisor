@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.app-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-title {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.spacer { flex: 1; }
+
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+
+  .widget-temp { font-weight: 600; font-size: 1rem; }
+  .widget-rain { opacity: 0.9; }
+  .widget-wind {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+  }
+  .wind-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+  }
+  .widget-placeholder { opacity: 0.7; }
+}
+
+.sidenav-container {
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+}
+
+.sidebar {
+  width: 40%;
+  min-width: 320px;
+  max-width: 480px;
+  overflow-y: auto;
+  border-left: 1px solid var(--mat-sys-outline-variant);
+}
+
+.main-content {
+  height: 100%;
+}
+
+.map-placeholder, .map-skeleton-full {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.api-key-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #fff3cd;
+  color: #664d03;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #ffc107;
+
+  mat-icon { color: #ffc107; }
+  span { flex: 1; }
+  code { font-size: 0.8em; background: rgba(0,0,0,0.1); padding: 1px 4px; border-radius: 3px; }
+
+  &.api-error-banner {
+    background: #fdecea;
+    color: #6a1a15;
+    border-color: #f44336;
+    mat-icon { color: #f44336; }
+  }
+}
+
+// Dark theme overrides
+.dark-theme {
+  .api-key-banner {
+    background: #3d3000;
+    color: #ffd54f;
+    border-color: #ffa000;
+  }
+
+  .api-error-banner {
+    background: #3b0f0c;
+    color: #ffcdd2;
+    border-color: #ef9a9a;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .weather-widget .widget-rain,
+  .weather-widget .widget-wind {
+    display: none;
+  }
+}

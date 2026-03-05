@@ -1,0 +1,18 @@
+{
+  "id": "sample-2",
+  "name": "Centennial Hall Park Circuit",
+  "waypoints": [
+    {"lat": 51.1067, "lon": 17.0771, "elevation": 115},
+    {"lat": 51.1090, "lon": 17.0800, "elevation": 114},
+    {"lat": 51.1120, "lon": 17.0820, "elevation": 116},
+    {"lat": 51.1150, "lon": 17.0790, "elevation": 118},
+    {"lat": 51.1160, "lon": 17.0750, "elevation": 120},
+    {"lat": 51.1140, "lon": 17.0710, "elevation": 117},
+    {"lat": 51.1100, "lon": 17.0700, "elevation": 115},
+    {"lat": 51.1067, "lon": 17.0771, "elevation": 115}
+  ],
+  "distance": 8.1,
+  "elevationGain": 22,
+  "elevationLoss": 22,
+  "color": "#4CAF50"
+}

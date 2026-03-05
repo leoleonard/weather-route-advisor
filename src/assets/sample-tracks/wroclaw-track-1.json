@@ -1,0 +1,18 @@
+{
+  "id": "sample-1",
+  "name": "Wrocław Old Town Loop",
+  "waypoints": [
+    {"lat": 51.1079, "lon": 17.0385, "elevation": 120},
+    {"lat": 51.1120, "lon": 17.0350, "elevation": 118},
+    {"lat": 51.1150, "lon": 17.0400, "elevation": 122},
+    {"lat": 51.1140, "lon": 17.0450, "elevation": 125},
+    {"lat": 51.1100, "lon": 17.0480, "elevation": 121},
+    {"lat": 51.1060, "lon": 17.0460, "elevation": 119},
+    {"lat": 51.1050, "lon": 17.0400, "elevation": 118},
+    {"lat": 51.1079, "lon": 17.0385, "elevation": 120}
+  ],
+  "distance": 5.2,
+  "elevationGain": 15,
+  "elevationLoss": 15,
+  "color": "#2196F3"
+}

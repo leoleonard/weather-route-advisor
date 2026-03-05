@@ -1,0 +1,162 @@
+<div class="recommendation-panel" [formGroup]="form">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Route Recommendation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <!-- Activity & conditions -->
+      <div class="section-label">
+        <mat-icon>tune</mat-icon>
+        Preferences
+      </div>
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Activity</mat-label>
+          <mat-select formControlName="activityType" (valueChange)="onActivityChange($event)">
+            <mat-option value="cycling">🚴 Cycling</mat-option>
+            <mat-option value="running">🏃 Running</mat-option>
+            <mat-option value="hiking">🥾 Hiking</mat-option>
+            <mat-option value="walking">🚶 Walking</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Rain Tolerance</mat-label>
+          <mat-select formControlName="rainTolerance">
+            <mat-option value="none">☀️ No Rain</mat-option>
+            <mat-option value="light-rain-ok">🌦️ Light Rain OK</mat-option>
+            <mat-option value="any-weather">🌧️ Any Weather</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Wind Sensitivity</mat-label>
+          <mat-select formControlName="windSensitivity">
+            <mat-option value="low">Low</mat-option>
+            <mat-option value="medium">Medium</mat-option>
+            <mat-option value="high">High</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="toggle-cell">
+          <mat-slide-toggle formControlName="preferHilly">Prefer hilly</mat-slide-toggle>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Day & time -->
+      <div class="section-label">
+        <mat-icon>calendar_today</mat-icon>
+        When
+      </div>
+      <div class="day-time-row">
+        <mat-button-toggle-group formControlName="startDayOffset" class="day-toggle-group">
+          @for (day of dayOptions(); track day.offset) {
+            <mat-button-toggle [value]="day.offset" class="day-toggle">
+              <span class="day-label">{{ day.label }}</span>
+              <span class="day-sub">{{ day.sub }}</span>
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+
+        <mat-form-field appearance="outline" class="hour-field">
+          <mat-label>Hour</mat-label>
+          <mat-select formControlName="startHour">
+            @for (h of [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]; track h) {
+              <mat-option [value]="h">{{ h }}:00</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <p class="start-time-summary">
+        <mat-icon>schedule</mat-icon>
+        <strong>{{ startTimeLabel() }}</strong>
+        · est. <strong>{{ computedDurationMinutes() | duration }}</strong>
+        <span class="track-count">({{ filteredCount() }} track{{ filteredCount() !== 1 ? 's' : '' }} match)</span>
+      </p>
+
+      <mat-divider></mat-divider>
+
+      <!-- Distance range slider -->
+      <div class="section-label">
+        <mat-icon>straighten</mat-icon>
+        Distance
+        <span class="section-value">{{ form.value.minDistanceKm }}–{{ form.value.maxDistanceKm }} km</span>
+      </div>
+      <mat-slider min="0" max="200" step="5" discrete class="full-slider">
+        <input matSliderStartThumb formControlName="minDistanceKm">
+        <input matSliderEndThumb formControlName="maxDistanceKm">
+      </mat-slider>
+      <div class="slider-ticks-label">
+        <span>0 km</span><span>50</span><span>100</span><span>150</span><span>200 km</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Speed slider -->
+      <div class="section-label">
+        <mat-icon>speed</mat-icon>
+        Speed
+        <span class="section-value">{{ effectiveSpeedKmh() }} km/h</span>
+        <mat-slide-toggle formControlName="useCustomSpeed" class="speed-toggle">Custom</mat-slide-toggle>
+      </div>
+      <mat-slider min="2" max="60" step="1" discrete class="full-slider"
+                  [disabled]="!form.value.useCustomSpeed">
+        <input matSliderThumb formControlName="customSpeedKmh">
+      </mat-slider>
+      <div class="slider-ticks-label">
+        <span>2 km/h</span><span>20</span><span>40</span><span>60 km/h</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" (click)="compute()"
+                [disabled]="tracks().length === 0 || filteredCount() === 0">
+          <mat-icon>recommend</mat-icon>
+          Find Best Routes
+        </button>
+        @if (hasResults()) {
+          <button mat-stroked-button (click)="clear()">Clear</button>
+        }
+        @if (tracks().length === 0) {
+          <span class="no-tracks-msg">Upload GPX tracks first.</span>
+        } @else if (filteredCount() === 0) {
+          <span class="no-tracks-msg">No tracks in range — adjust distance filter.</span>
+        }
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  @if (hasResults()) {
+    <div class="results">
+      <h3>Top Recommendations</h3>
+      @for (rec of recommendations(); track rec.track.id) {
+        <mat-card class="rec-card" [class]="'rank-' + rec.rank">
+          <mat-card-content>
+            <div class="rec-header">
+              <span class="rank-icon">{{ rankIcon(rec.rank) }}</span>
+              <div class="rec-info">
+                <strong>{{ rec.track.name }}</strong>
+                <span class="rec-score">Score: {{ rec.score | number:'1.0-0' }}</span>
+              </div>
+            </div>
+            <div class="rec-chips">
+              <mat-chip>{{ rec.track.distance }} km</mat-chip>
+              <mat-chip [matTooltip]="'At ' + rec.speedUsedKmh + ' km/h'">
+                {{ rec.estimatedDurationMinutes | duration }}
+              </mat-chip>
+              <mat-chip>{{ rec.speedUsedKmh }} km/h</mat-chip>
+              <mat-chip>{{ rec.rainProbability }}% rain</mat-chip>
+              <mat-chip>{{ rec.windSpeedKmh }} km/h {{ rec.windDirectionLabel }}</mat-chip>
+            </div>
+            <p class="rec-explanation">{{ rec.explanation }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

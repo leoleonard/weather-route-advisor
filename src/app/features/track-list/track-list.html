@@ -1,0 +1,62 @@
+<div class="track-list">
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDragOver()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+  >
+    <mat-icon>upload_file</mat-icon>
+    <p>Drop GPX files here or</p>
+    <button mat-stroked-button (click)="fileInput.click()">
+      Browse Files
+    </button>
+    <input #fileInput type="file" accept=".gpx" multiple hidden (change)="onFileInput($event)">
+    <p class="hint">Supports bulk upload of 50+ files</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="24"></mat-spinner>
+      <span>Loading tracks...</span>
+    </div>
+  }
+
+  @if (trackCount() === 0 && !loading()) {
+    <div class="empty-state">
+      <mat-icon>route</mat-icon>
+      <p>No tracks loaded. Upload GPX files or use sample tracks.</p>
+    </div>
+  }
+
+  <div class="tracks-header">
+    <h3>Tracks ({{ trackCount() }})</h3>
+  </div>
+
+  <mat-list>
+    @for (track of tracks(); track track.id) {
+      <mat-list-item class="track-item">
+        <div class="track-row">
+          <span class="track-color-dot" [style.background]="track.color ?? '#9E9E9E'"></span>
+          <div class="track-info">
+            <span class="track-name">{{ track.name }}</span>
+            <div class="track-meta">
+              <mat-chip>{{ track.distance }} km</mat-chip>
+              <mat-chip>+{{ track.elevationGain }}m</mat-chip>
+            </div>
+          </div>
+          <div class="track-actions">
+            <mat-slide-toggle
+              [checked]="isVisible(track.id)"
+              (change)="toggleVisibility(track)"
+              aria-label="Toggle track visibility"
+            ></mat-slide-toggle>
+            <button mat-icon-button (click)="removeTrack(track)" aria-label="Remove track">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-list-item>
+    }
+  </mat-list>
+</div>

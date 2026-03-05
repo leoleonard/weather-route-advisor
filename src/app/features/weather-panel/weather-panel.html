@@ -1,0 +1,66 @@
+<div class="weather-panel">
+  <mat-card class="current-weather-card">
+    <mat-card-header>
+      <mat-card-title>Wrocław Weather</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (weatherService.currentWeather(); as cw) {
+        <div class="current-weather">
+          <div class="temp-block">
+            <span class="temperature">{{ currentTemp() }}°C</span>
+            <span class="feels-like">Feels {{ feelsLike() }}°C</span>
+          </div>
+          <div class="weather-details">
+            <div class="detail-item">
+              <mat-icon>water_drop</mat-icon>
+              <span>Rain: {{ weatherService.currentRainProbability() }}%</span>
+            </div>
+            <div class="detail-item wind-item">
+              <mat-icon class="wind-arrow" [style.transform]="'rotate(' + windDeg() + 'deg)'">arrow_upward</mat-icon>
+              <span>{{ windSpeedKmh() }} km/h {{ windDeg() | windDirection }}</span>
+            </div>
+            <div class="detail-item">
+              <mat-icon>cloud</mat-icon>
+              <span>{{ weatherDescription() }}</span>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="weather-skeleton">
+          @if (weatherService.isConfigured()) {
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+          } @else {
+            <p class="no-key-msg">Configure OpenWeatherMap API key to see live weather.</p>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <div class="hourly-section">
+    <h3>Next 12 Hours</h3>
+    <div class="hourly-timeline">
+      @for (item of hourlyItems(); track item.dt) {
+        <div class="hour-block" [class]="'rain-' + getRainIntensity(item.pop)">
+          <span class="hour-time">{{ getHourLabel(item.dt) }}</span>
+          @if (item.weather[0]) {
+            <img class="weather-icon" [src]="getWeatherIcon(item.weather[0].icon)" [alt]="item.weather[0].description">
+          }
+          <span class="hour-temp">{{ item.main.temp | number:'1.0-0' }}°</span>
+          <span class="rain-prob">{{ (item.pop * 100) | number:'1.0-0' }}%</span>
+          <div class="wind-mini">
+            <span class="wind-arrow-mini" [style.transform]="'rotate(' + item.wind.deg + 'deg)'">↑</span>
+            <span>{{ (item.wind.speed * 3.6) | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      } @empty {
+        @for (i of [1,2,3,4,5,6,7,8,9,10,11,12]; track i) {
+          <div class="hour-block skeleton">
+            <div class="skeleton-block"></div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
