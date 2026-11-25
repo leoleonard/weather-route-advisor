@@ -8,7 +8,7 @@ import {
   effect,
   signal,
   afterNextRender,
-  OnDestroy,
+  OnDestroy
 } from '@angular/core';
 import * as L from 'leaflet';
 import { GpxTrack } from '../../shared/models/track.model';

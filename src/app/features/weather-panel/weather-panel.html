@@ -27,12 +27,8 @@
         </div>
       } @else {
         <div class="weather-skeleton">
-          @if (weatherService.isConfigured()) {
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line short"></div>
-          } @else {
-            <p class="no-key-msg">Configure OpenWeatherMap API key to see live weather.</p>
-          }
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
         </div>
       }
     </mat-card-content>
@@ -45,7 +41,7 @@
         <div class="hour-block" [class]="'rain-' + getRainIntensity(item.pop)">
           <span class="hour-time">{{ getHourLabel(item.dt) }}</span>
           @if (item.weather[0]) {
-            <img class="weather-icon" [src]="getWeatherIcon(item.weather[0].icon)" [alt]="item.weather[0].description">
+            <mat-icon class="weather-icon" [attr.aria-label]="item.weather[0].description" aria-hidden="false">{{ item.weather[0].icon }}</mat-icon>
           }
           <span class="hour-temp">{{ item.main.temp | number:'1.0-0' }}°</span>
           <span class="rain-prob">{{ (item.pop * 100) | number:'1.0-0' }}%</span>

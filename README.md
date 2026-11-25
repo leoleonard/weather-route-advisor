@@ -1,55 +1,52 @@
 # Weather Route Advisor
 
-An Angular 20 application for GPS route recommendation based on real-time weather conditions in Wrocław, Poland.
+Picks the best route for your next ride or run. Upload your GPX tracks, set how long you want to ride, and the app ranks the routes against the live wind and rain forecast for Wrocław.
 
-## Features
+**Live demo:** https://leoleonard.github.io/weather-route-advisor/ (three sample tracks load automatically)
 
-- **Live Weather**: Current conditions + 48h forecast from OpenWeatherMap with 15-minute auto-refresh
-- **GPX Track Management**: Bulk upload (50+ files), DOMParser-based parsing, IndexedDB persistence
-- **Smart Route Recommendations**: Scoring algorithm factoring rain, wind direction (headwind/tailwind), duration fit, and elevation preference
-- **Interactive Map**: Leaflet map with color-coded tracks (gold/silver/bronze for top recommendations)
-- **Dark/Light Theme**: Full Angular Material M3 theming
-- **Standalone / Zoneless**: Angular 20 with `provideZonelessChangeDetection()`, signals everywhere
+## What it does
 
-## Quick Start
+- **Route ranking** - each track gets a score from rain probability and intensity in the ride window, headwind vs tailwind along the route bearing, how well the duration fits, and elevation preference
+- **Live weather** - current conditions and a 48-hour hourly forecast from [Open-Meteo](https://open-meteo.com), refreshed every 15 minutes
+- **GPX tracks** - bulk upload, parsing in the browser, stored in IndexedDB (localStorage fallback)
+- **Map** - Leaflet, top three recommendations colour-coded
+- **Light and dark theme** - Angular Material 3
 
-### 1. Get a Free OpenWeatherMap API Key
+## Stack
 
-1. Go to https://openweathermap.org/api and create a free account
-2. Navigate to **API Keys** in your dashboard and copy your key
-3. Free tier covers current weather + 5-day forecast — sufficient for this app
+Angular 22 · zoneless change detection · signals · standalone components · RxJS · Angular Material 3 · Leaflet · Jasmine/Karma
 
-### 2. Configure the API Key
+## Design notes
 
-Edit `src/environments/environment.ts`:
+- **Zoneless, signals first.** No zone.js at runtime. Components use the default OnPush strategy and read state only from signals, `computed` and `input()`.
+- **RxJS only at the edge.** The weather poll is one `timer` + `switchMap` stream, bridged to signals with `toSignal()`. Everything downstream is synchronous `computed` state.
+- **Provider-independent weather model.** `WeatherService` maps the Open-Meteo response to the app's own model, so the UI and the recommender do not know which API is behind it. Open-Meteo needs no API key, which lets the app ship as a static site with no secrets in the bundle.
+- **Pure scoring logic.** `RouteRecommenderService` is plain functions over tracks and a weather window: `100 - rain penalty - wind penalty + duration fit + elevation bonus`. Wind direction is averaged as a circular mean.
+- **No GPX dependency.** `GpxParserService` uses `DOMParser`, haversine distance and cumulative elevation gain/loss.
+- **Leaflet outside the render path.** The map is created in `afterNextRender()` and updated from an `effect()`.
 
-```typescript
-export const environment = {
-  production: false,
-  openWeatherMapApiKey: 'YOUR_ACTUAL_KEY_HERE',
-};
-```
-
-### 3. Install & Run
+## Run locally
 
 ```bash
 npm install
-ng serve
+npm start          # http://localhost:4200
+npm test -- --watch=false
+npm run build
 ```
 
-Open http://localhost:4200 — 3 sample Wrocław tracks load automatically for immediate preview.
+No configuration or API key is required.
 
-## Building
+## Project structure
 
-```bash
-ng build --configuration production   # production build
-ng test --watch=false                 # run 16 unit tests
+```
+src/app/
+  core/services/     weather, GPX parsing, recommender, track storage
+  features/          map, weather-panel, track-list, recommendation
+  shared/            models, pipes, weather-code mapping
 ```
 
-## Architecture
+## Deployment
 
-- **WeatherService**: OpenWeatherMap API with RxJS timer (15-min refresh) bridged to signals via `toSignal()`
-- **GpxParserService**: Pure DOMParser-based GPX parsing, haversine distance, elevation gain/loss
-- **RouteRecommenderService**: Scoring = 100 - rain_penalty - wind_penalty + duration_fit_bonus + elevation_bonus
-- **TrackStorageService**: IndexedDB persistence with localStorage fallback
-- **MapComponent**: Leaflet initialized in `afterNextRender()`, signal-driven track/recommendation updates
+`.github/workflows/ci.yml` runs tests and a production build on every push, and publishes `main` to GitHub Pages.
+
+Weather data by [Open-Meteo](https://open-meteo.com) (CC BY 4.0). Map data © OpenStreetMap contributors.

@@ -67,10 +67,6 @@
     &.short { width: 60%; }
   }
 
-  .no-key-msg {
-    font-size: 0.875rem;
-    color: var(--mat-sys-on-surface-variant);
-  }
 }
 
 .hourly-section {
@@ -120,6 +116,7 @@
   .weather-icon {
     width: 30px;
     height: 30px;
+    font-size: 30px;
   }
 
   .hour-temp {

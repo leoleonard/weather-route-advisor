@@ -4,7 +4,7 @@ import {
   signal,
   computed,
   input,
-  output,
+  output
 } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, NonNullableFormBuilder } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';

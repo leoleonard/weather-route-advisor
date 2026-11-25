@@ -57,7 +57,4 @@ export class WeatherPanelComponent {
     return 'heavy';
   }
 
-  protected getWeatherIcon(iconCode: string): string {
-    return `https://openweathermap.org/img/wn/${iconCode}.png`;
-  }
 }

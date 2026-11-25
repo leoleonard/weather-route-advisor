@@ -1,13 +1,4 @@
 <div [class.dark-theme]="isDarkTheme()">
-  @if (!weatherService.isConfigured()) {
-    <div class="api-key-banner">
-      <mat-icon>key</mat-icon>
-      <span>OpenWeatherMap API key not configured. Edit <code>src/environments/environment.ts</code> — see README.</span>
-      <button mat-icon-button (click)="weatherService.isConfigured.set(true)" aria-label="Dismiss">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  }
   @if (weatherService.apiError()) {
     <div class="api-key-banner api-error-banner">
       <mat-icon>cloud_off</mat-icon>

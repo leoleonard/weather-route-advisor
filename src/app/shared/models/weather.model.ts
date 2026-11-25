@@ -2,6 +2,7 @@ export interface WeatherCondition {
   id: number;
   main: string;
   description: string;
+  /** Material Symbols ligature name */
   icon: string;
 }
 
@@ -19,8 +20,8 @@ export interface WeatherWind {
 }
 
 export interface WeatherPrecipitation {
+  /** mm in the last hour */
   '1h'?: number;
-  '3h'?: number;
 }
 
 export interface WeatherHourlyItem {
@@ -30,7 +31,6 @@ export interface WeatherHourlyItem {
   pop: number; // 0-1 probability of precipitation
   rain?: WeatherPrecipitation;
   weather: WeatherCondition[];
-  dt_txt: string;
 }
 
 export interface CurrentWeatherResponse {
@@ -40,7 +40,6 @@ export interface CurrentWeatherResponse {
   rain?: WeatherPrecipitation;
   weather: WeatherCondition[];
   name: string;
-  visibility: number;
 }
 
 export interface ForecastResponse {
@@ -49,5 +48,39 @@ export interface ForecastResponse {
     name: string;
     coord: { lat: number; lon: number };
     timezone: number;
+  };
+}
+
+/** Subset of the Open-Meteo /v1/forecast response used by the app. */
+export interface OpenMeteoResponse {
+  latitude: number;
+  longitude: number;
+  utc_offset_seconds: number;
+  current: {
+    time: number;
+    temperature_2m: number;
+    apparent_temperature: number;
+    relative_humidity_2m: number;
+    surface_pressure: number;
+    precipitation: number;
+    weather_code: number;
+    wind_speed_10m: number;
+    wind_direction_10m: number;
+    wind_gusts_10m: number;
+    is_day: number;
+  };
+  hourly: {
+    time: number[];
+    temperature_2m: number[];
+    apparent_temperature: number[];
+    relative_humidity_2m: number[];
+    surface_pressure: number[];
+    precipitation_probability: (number | null)[];
+    precipitation: number[];
+    weather_code: number[];
+    wind_speed_10m: number[];
+    wind_direction_10m: number[];
+    wind_gusts_10m: number[];
+    is_day: number[];
   };
 }
